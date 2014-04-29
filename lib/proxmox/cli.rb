@@ -30,8 +30,9 @@ module Proxmox
       config['user'] = defaults['user'] if config['user'] == ""
 
       print "Proxmox password (#{defaults['password']}): "
-      config['password'] = $stdin.gets.chomp
+      config['password'] = $stdin.noecho(&:gets).chomp
       config['password'] = defaults['password'] if config['password'] == ""
+      puts "\n"
 
       print "Proxmox realm (#{defaults['realm']}): "
       config['realm'] = $stdin.gets.chomp
