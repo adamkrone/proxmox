@@ -52,10 +52,66 @@ module Proxmox
       ap proxmox.templates
     end
 
+    desc "openvz_create", "Creates an OpenVZ container"
+    option :ostemplate, :aliases => "-t"
+    option :vmid, :aliases => "-v"
+    option :hostname, :aliases => "-h"
+    option :ip_address, :aliases => "-i"
+    option :cpus, :aliases => "-c"
+    option :memory, :aliases => "-m"
+    option :swap, :aliases => "-s"
+    def openvz_create
+      config = load_proxmoxrc
+      proxmox = authenticate(config)
+      ostemplate = options[:ostemplate]
+      vmid = options[:vmid]
+      optional_config = {}
+
+      options.each do |key, value|
+        optional_config[key.to_s] = value
+      end
+
+      task = proxmox.openvz_post(ostemplate,
+                          vmid,
+                          optional_config)
+
+      wait_status(proxmox, task)
+    end
+
+    desc "openvz_start", "Start an OpenVZ container"
+    def openvz_start(vmid)
+      config = load_proxmoxrc
+      proxmox = authenticate(config)
+      task = proxmox.openvz_start(vmid)
+      wait_status(proxmox, task)
+    end
+
+    desc "openvz_shutdown", "Shutdown an OpenVZ container"
+    def openvz_shutdown(vmid)
+      config = load_proxmoxrc
+      proxmox = authenticate(config)
+      task = proxmox.openvz_shutdown(vmid)
+      wait_status(proxmox, task)
+    end
+
+    desc "openvz_delete", "Delete an OpenVZ container"
+    def openvz_delete(vmid)
+      config = load_proxmoxrc
+      proxmox = authenticate(config)
+      task = proxmox.openvz_delete(vmid)
+      wait_status(proxmox, task)
+    end
+
+    desc "openvz_status", "Show status of OpenVZ container"
+    def openvz_status(vmid)
+      config = load_proxmoxrc
+      proxmox = authenticate(config)
+      ap proxmox.openvz_status(vmid)
+    end
+
     private
 
     def load_proxmoxrc
-      puts "Loading #{ENV['HOME']}/.proxmoxrc"
       begin
         YAML.load(File.read("#{ENV['HOME']}/.proxmoxrc"))
       rescue Errno::ENOENT
@@ -70,6 +126,15 @@ module Proxmox
                   config['user'],
                   config['password'],
                   config['realm'])
+    end
+
+    def wait_status(server, task)
+      puts task
+      while server.task_status(task) == "running"
+        print '.'
+        sleep 1
+      end
+      puts server.task_status(task)
     end
   end
 end
