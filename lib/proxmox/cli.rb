@@ -1,5 +1,6 @@
 require 'thor'
 require 'yaml'
+require 'awesome_print'
 require 'proxmox'
 
 module Proxmox
@@ -43,16 +44,32 @@ module Proxmox
       puts "Saved to #{ENV['HOME']}/.proxmoxrc"
     end
 
+    desc "templates", "Show available container templates"
+    def templates
+      config = load_proxmoxrc
+      proxmox = authenticate(config)
+
+      ap proxmox.templates
+    end
+
     private
 
     def load_proxmoxrc
       puts "Loading #{ENV['HOME']}/.proxmoxrc"
       begin
-        File.read("#{ENV['HOME']}/.proxmoxrc")
+        YAML.load(File.read("#{ENV['HOME']}/.proxmoxrc"))
       rescue Errno::ENOENT
         puts "Proxmox config not found. Use 'proxmox config' to create it."
         exit
       end
+    end
+
+    def authenticate(config)
+      Proxmox.new(config['api_url'],
+                  config['node_name'],
+                  config['user'],
+                  config['password'],
+                  config['realm'])
     end
   end
 end
