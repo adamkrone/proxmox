@@ -57,6 +57,7 @@ module Proxmox
     option :ostemplate, :aliases => "-t"
     option :vmid, :aliases => "-v"
     option :hostname, :aliases => "-h"
+    option :password, :aliases => "-p"
     option :ip_address, :aliases => "-i"
     option :cpus, :aliases => "-c"
     option :memory, :aliases => "-m"
