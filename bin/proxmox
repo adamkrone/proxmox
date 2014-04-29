@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'proxmox/cli'
+Proxmox::CLI.start

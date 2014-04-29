@@ -4,6 +4,8 @@ require 'proxmox/version'
 require 'rest_client'
 require 'json'
 
+require 'proxmox/cli'
+
 # This module encapsulates ability to manage Proxmox server
 module Proxmox
   # Object to manage Proxmox server
